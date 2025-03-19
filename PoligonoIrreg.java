@@ -17,7 +17,6 @@ public class PoligonoIrreg {
 
   public void anadeVertice(Coordenada newC) {
     vertices.add(newC);
-    System.out.println("Se agregó el vertice: " + newC);
   }
 
   @Override

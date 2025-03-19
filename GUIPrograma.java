@@ -44,6 +44,7 @@ class GUIPanel extends JPanel implements ActionListener {
         timer.start();
 
         asteroides = new Asteroide[no_asteroides];
+        Asteroide.setAsteroides(no_asteroides);
         Thread []hilos = new Thread[no_asteroides];
         for(int i = 0; i < no_asteroides; i++){
             asteroides[i] = Asteroide.newRandomAsteroide(WIDTH, HEIGHT, lock);

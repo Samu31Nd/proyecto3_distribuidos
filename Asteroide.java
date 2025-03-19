@@ -8,28 +8,37 @@ import java.awt.geom.AffineTransform;
 
 public class Asteroide extends PoligonoIrreg implements Runnable {
 
-    //TODO: accesed via synchronized only
-    //static private Asteroide []asteroides;
-
-    private int no_lados, radio;
-    //solo la forma, el angulo y posicion es otra cosa
+    static private Asteroide []asteroides;
+    private int radio, id_asteroide;
+    public int getRadio() {
+        return radio;
+    }
     public Polygon astToPolygon;
     private Coordenada centro;
-    private final Object lock;
+    public Coordenada getCentro() {
+        return centro;
+    }
 
+    private final Object lock;
     private double vX, vY;
+
+    public double getvX() {
+        return vX;
+    }
+
+    public double getvY() {
+        return vY;
+    }
 
     public Asteroide(int no_lados, Coordenada centro, Coordenada posicionInicial, int radio, Object lock){
         super(posicionInicial);
         this.lock = lock;
-
-        this.no_lados = no_lados;
         this.centro = centro;
         this.radio = radio;
 
         //velocidad
         double area = Math.PI * radio *radio;
-        double velocidad = 1000/area*8;
+        double velocidad = 1000/area*20;
         double angulo = Math.random() * 2 * Math.PI;
 
         this.vX = velocidad * Math.cos(angulo);
@@ -41,6 +50,10 @@ public class Asteroide extends PoligonoIrreg implements Runnable {
     @Override
     public String toString() {
         return "Asteroide!";
+    }
+
+    static public void setAsteroides(int n){
+        asteroides = new Asteroide[n];
     }
 
     static Random rand = new Random();
@@ -73,10 +86,12 @@ public class Asteroide extends PoligonoIrreg implements Runnable {
         g.draw(transformedAsteroid);
     }
 
-    public static int no_threads = 0;
+    public static int no_asteroides = 0;
     @Override
     public void run() {
-        System.out.println(no_threads++ + ". Hilo iniciado!");
+        id_asteroide = no_asteroides++;
+        asteroides[id_asteroide] = this;
+        System.out.println(id_asteroide + ". Hilo iniciado!");
         while(true){
             synchronized(lock){
                 try {
@@ -93,9 +108,17 @@ public class Asteroide extends PoligonoIrreg implements Runnable {
         posicion.x += vX;
         posicion.y += vY;
 
-        if(posicion.getX() < 0) posicion.x = 1280 - 76;
-        if(posicion.getX() > 1280 - 76) posicion.x = 0;
-        if(posicion.getY() < -13) posicion.y = 720 - 110;
-        if(posicion.getY() > 720 - 110) posicion.y = -13;
+
+        //handle position out of window
+        if(posicion.getX() < -65) posicion.x = 1280 - 76;
+        if(posicion.getX() > 1280 - 76) posicion.x = -55;
+        if(posicion.getY() < -70) posicion.y = 720 - 95;
+        if(posicion.getY() > 720 - 95) posicion.y = -70;
+
+        //handle impact with other object
+        for(int i = 0; i < no_asteroides; i++){
+            if(i == id_asteroide) continue;
+            
+        }
     }
 }
