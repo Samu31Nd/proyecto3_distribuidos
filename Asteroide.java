@@ -8,17 +8,32 @@ import java.awt.geom.AffineTransform;
 
 public class Asteroide extends PoligonoIrreg implements Runnable {
 
+    //TODO: accesed via synchronized only
+    //static private Asteroide []asteroides;
+
     private int no_lados, radio;
     //solo la forma, el angulo y posicion es otra cosa
     public Polygon astToPolygon;
     private Coordenada centro;
+    private final Object lock;
 
-    public Asteroide(int no_lados, Coordenada centro, Coordenada posicionInicial, int radio){
+    private double vX, vY;
+
+    public Asteroide(int no_lados, Coordenada centro, Coordenada posicionInicial, int radio, Object lock){
         super(posicionInicial);
+        this.lock = lock;
 
         this.no_lados = no_lados;
         this.centro = centro;
         this.radio = radio;
+
+        //velocidad
+        double area = Math.PI * radio *radio;
+        double velocidad = 1000/area*8;
+        double angulo = Math.random() * 2 * Math.PI;
+
+        this.vX = velocidad * Math.cos(angulo);
+        this.vY = velocidad * Math.sin(angulo);
 
         System.out.println("\nAsteroide creado!");
     }
@@ -29,10 +44,10 @@ public class Asteroide extends PoligonoIrreg implements Runnable {
     }
 
     static Random rand = new Random();
-    public static Asteroide newRandomAsteroide(int w, int h){
+    public static Asteroide newRandomAsteroide(int w, int h, Object lock){
         int no_lados = rand.nextInt(6,20);
         int radio = rand.nextInt(10 + (no_lados*2),w/(8*2));
-        Asteroide a = new Asteroide(no_lados, new Coordenada(radio, radio), Coordenada.getRandCoord(radio, w - radio, radio, h - radio) , radio);
+        Asteroide a = new Asteroide(no_lados, new Coordenada(radio, radio), Coordenada.getRandCoord(radio, w - radio, radio, h - radio) , radio, lock);
 
         int[] xPoints = new int[no_lados];
         int[] yPoints = new int[no_lados];
@@ -62,5 +77,25 @@ public class Asteroide extends PoligonoIrreg implements Runnable {
     @Override
     public void run() {
         System.out.println(no_threads++ + ". Hilo iniciado!");
+        while(true){
+            synchronized(lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            mover();
+        }
+    }
+
+    private void mover(){
+        posicion.x += vX;
+        posicion.y += vY;
+
+        if(posicion.getX() < 0) posicion.x = 1280 - 76;
+        if(posicion.getX() > 1280 - 76) posicion.x = 0;
+        if(posicion.getY() < -13) posicion.y = 720 - 110;
+        if(posicion.getY() > 720 - 110) posicion.y = -13;
     }
 }

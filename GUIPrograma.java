@@ -32,6 +32,8 @@ class GUIPanel extends JPanel implements ActionListener {
     Graphics2D canvas;
     static Asteroide []asteroides;
 
+    static Object lock = new Object();
+
     private final int WIDTH, HEIGHT;
     public GUIPanel(Dimension size, int no_asteroides){
         this.WIDTH = ((int) size.getWidth()) - 76;
@@ -44,7 +46,7 @@ class GUIPanel extends JPanel implements ActionListener {
         asteroides = new Asteroide[no_asteroides];
         Thread []hilos = new Thread[no_asteroides];
         for(int i = 0; i < no_asteroides; i++){
-            asteroides[i] = Asteroide.newRandomAsteroide(WIDTH, HEIGHT);
+            asteroides[i] = Asteroide.newRandomAsteroide(WIDTH, HEIGHT, lock);
             hilos[i] = new Thread(asteroides[i]);
             hilos[i].start();
         }
@@ -62,6 +64,14 @@ class GUIPanel extends JPanel implements ActionListener {
         canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         reDrawBackground();
         reDrawAsteroids();
+        try {
+            Thread.sleep(50); // tiempo para que los hilos de asteroides esten listos
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        synchronized(lock){
+            lock.notifyAll(); //despierta a todos los hilos
+        }
     }
 
     void reDrawBackground(){
