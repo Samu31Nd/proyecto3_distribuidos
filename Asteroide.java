@@ -1,9 +1,9 @@
 import java.awt.geom.AffineTransform;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.util.Random;
 import java.awt.Shape;
+import java.awt.Color;
 
 public class Asteroide extends PoligonoIrreg implements Runnable {
     static Random rand = new Random();

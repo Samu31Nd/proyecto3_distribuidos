@@ -29,13 +29,6 @@ public class Coordenada {
       return "[" + (int)x + "," + (int)y + "]";
     }
 
-    /*
-     * c1 - c2
-     */
-    static Coordenada substract(Coordenada c1, Coordenada c2){
-      return new Coordenada(c1.x - c2.x,c1.y-c2.y);
-    }
-
     static Random rand = new Random();
     static final int despBorder = 80;
     static Coordenada getRandCoord(int xBound, int yBound){
